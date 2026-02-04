@@ -1,0 +1,128 @@
+﻿@page
+@using WebApplication1.Models
+@model WebApplication1.Pages.ProductsModel
+@{
+    ViewData["Title"] = "Товари";
+}
+
+<h2>Управління товарами</h2>
+
+<form action="?handler=Add" method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <input type="text" asp-for="CurrentProduct.Name"
+               class="form-control" placeholder="Назва" required />
+    </div>
+    <div class="mb-3">
+        <input type="text" asp-for="CurrentProduct.Description"
+               class="form-control" placeholder="Опис" required />
+    </div>
+    <div class="mb-3">
+        <input type="number" asp-for="CurrentProduct.Price"
+               class="form-control" placeholder="Ціна" step="0.01" required />
+    </div>
+    <button type="submit" class="btn btn-success">
+        Додати
+    </button>
+</form>
+
+<hr />
+
+<h3>Список товарів</h3>
+<ul class="list-group">
+    @foreach (Product product in Model.Products)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <strong>@(product.Id).</strong> @(product.Name) —
+                @(product.Description)
+                (<strong>@(product.Price) грн.</strong>)
+            </span>
+            <div>
+                <button class="btn btn-warning btn-sm edit-product"
+                        data-id="@product.Id">
+                    Змінити
+                </button>
+                <button class="btn btn-danger btn-sm delete-product"
+                        data-id="@product.Id">
+                    Видалити
+                </button>
+            </div>
+        </li>
+    }
+</ul>
+
+@section Scripts {
+    <script>
+        const token = document.querySelector(
+            'input[name="__RequestVerificationToken"]'
+        ).value;
+
+        const nameInput = document.querySelector('input[name="CurrentProduct.Name"]');
+        const descInput = document.querySelector('input[name="CurrentProduct.Description"]');
+        const priceInput = document.querySelector('input[name="CurrentProduct.Price"]');
+        document.querySelectorAll("button.edit-product")
+            .forEach(button => {
+                button.addEventListener("click", () => {
+                    const productId = button.getAttribute("data-id");
+
+                    const name = nameInput.value;
+                    const description = descInput.value;
+                    const price = priceInput.value;
+
+                    if (!name || !description || !price) {
+                        alert("Будь ласка, заповніть всі поля форми!");
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('CurrentProduct.Name', name);
+                    formData.append('CurrentProduct.Description', description);
+                    formData.append('CurrentProduct.Price', price);
+                    formData.append('__RequestVerificationToken', token);
+
+                    fetch(`?handler=Update&id=${productId}`, {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert("Помилка при оновленні товару!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("Помилка при оновленні товару!");
+                    });
+                });
+            });
+
+        document.querySelectorAll("button.delete-product")
+            .forEach(button => {
+                button.addEventListener("click", () => {
+                    if (!confirm("Ви впевнені, що хочете видалити цей товар?")) {
+                        return;
+                    }
+
+                    const productId = button.getAttribute("data-id");
+
+                    fetch(`?handler=Delete&id=${productId}`, {
+                        method: "POST",
+                        headers: {
+                            "RequestVerificationToken": token
+                        }
+                    })
+                    .then(() => {
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("Помилка при видаленні товару!");
+                    });
+                });
+            });
+    </script>
+}
