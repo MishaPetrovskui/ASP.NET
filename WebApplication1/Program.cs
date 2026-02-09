@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 // ÄÎÄÀÉÒÅ ÖÅÉ ĞßÄÎÊ - ğåºñòğàö³ÿ ProductsService
-builder.Services.AddSingleton<ProductsService>();
+builder.Services.AddSingleton<JobService>();
 
 var app = builder.Build();
 
