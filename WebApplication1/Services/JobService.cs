@@ -47,21 +47,27 @@ namespace WebApplication1.Services
             }
         }
 
-        public void Filter(Job job)
+        public List<Job> Filter(
+            string? department = null,
+            string? position = null,
+            string? last_name = null,
+            string? gender = null,
+            string? brigade = null,
+            decimal? salaryMin = null,
+            decimal? salaryMax = null,
+            int? heightMin = null,
+            int? children = null)
         {
-            _jobs = _jobs.Where(p =>
-                (string.IsNullOrEmpty(job.first_name) || p.first_name.Contains(job.first_name, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(job.last_name) || p.last_name.Contains(job.last_name, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(job.middle_name) || p.middle_name.Contains(job.middle_name, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(job.brigade) || p.brigade.Contains(job.brigade, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(job.gender) || p.gender.Contains(job.department, StringComparison.OrdinalIgnoreCase)) &&
-                (job.birthday == default || p.birthday.Date == job.birthday.Date) &&
-                (job.height == 0 || p.height == job.height) &&
-                (string.IsNullOrEmpty(job.position) || p.position.Contains(job.position, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(job.department) || p.department.Contains(job.department, StringComparison.OrdinalIgnoreCase)) &&
-                (job.hired == default || p.hired.Date == job.hired.Date) &&
-                (job.salary == 0 || p.salary == job.salary) &&
-                (job.children == 0 || p.children == job.children)
+            return _jobs.Where(p =>
+                (string.IsNullOrEmpty(department) || p.department.Contains(department, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(position) || p.position.Contains(position, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(last_name) || p.last_name.Contains(last_name, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(gender) || p.gender.Equals(gender, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(brigade) || p.brigade.Contains(brigade, StringComparison.OrdinalIgnoreCase)) &&
+                (salaryMin == null || p.salary >= salaryMin) &&
+                (salaryMax == null || p.salary <= salaryMax) &&
+                (heightMin == null || p.height >= heightMin) &&
+                (children == null || p.children == children)
             ).ToList();
         }
     }

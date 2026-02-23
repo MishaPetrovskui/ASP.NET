@@ -36,20 +36,20 @@ namespace WebApplication1.Pages
 
         public IActionResult OnPostUpdate(int id)
         {
-            if (!ModelState.IsValid)
+            ModelState.Clear();
+
+            if (string.IsNullOrWhiteSpace(CurrentJob.last_name) ||
+                string.IsNullOrWhiteSpace(CurrentJob.first_name))
             {
-                return new JsonResult(new { success = false });
+                return new JsonResult(new { success = false, error = "Required fields missing" });
             }
-            
+
             _job.Update(id, CurrentJob);
             return new JsonResult(new { success = true });
         }
 
         public IActionResult OnPostDelete(int id)
         {
-            if (!ModelState.IsValid) {
-                return new JsonResult(new { success = false });
-            }
             _job.Delete(id);
             return new JsonResult(new { success = true });
         }
